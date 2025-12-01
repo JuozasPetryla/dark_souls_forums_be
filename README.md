@@ -1,4 +1,4 @@
-# Dark souls forums BE setup
+# Dark Souls Forums BE Setup
 
 ## Prerequisites
 
@@ -6,18 +6,20 @@
 
 ## Setup
 
-1. `cp .env.example .env`
-2. `docker-compose up --build -d`
+1. Setup environmental variables:  
+```cp .env.placeholder .env```
+2. Launch the containers:  
+`docker-compose up --build -d`
 
-This will open necessary servers on these ports:
+---
 
-FastAPI app → http://localhost:8000
+## Available Services (after startup)
+- **FastAPI app** → http://localhost:8000  
+- **Swagger UI** → http://localhost:8000/docs  
+- **pgAdmin** → http://localhost:8080  
 
-Swagger UI → http://localhost:8000/docs
+---
 
-pgAdmin → http://localhost:8080
-
-pg admin logins
-
-username -> admin@admin.com
-password -> admin
+## pgAdmin Credentials
+- Username: admin@admin.com  
+- Password: admin  
