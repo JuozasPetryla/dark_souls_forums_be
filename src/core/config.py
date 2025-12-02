@@ -16,4 +16,8 @@ class Settings:
         f"{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
     )
 
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+    JWT_SIGNING_ALGORITHM = os.getenv("JWT_SIGNING_ALGORITHM")
+    JWT_EXPIRATION_MINUTES = int(os.getenv("JWT_EXPIRATION_MINUTES"))
+
 settings = Settings()

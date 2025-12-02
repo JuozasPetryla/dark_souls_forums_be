@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, func, Boolean, ForeignKey, Text
 from sqlalchemy.orm import relationship
+
+from src.db.models.comment_rating import CommentRating
 from ..base import Base
 
 class Comment(Base):
@@ -20,4 +22,4 @@ class Comment(Base):
 
     author = relationship("User", back_populates="comments", foreign_keys=[author_id])
     post = relationship("Post", back_populates="comments", foreign_keys=[post_id])
-    ratings = relationship("CommentRating", back_populates="comment", foreign_keys=["CommentRating.comment_id"])
+    ratings = relationship("CommentRating", back_populates="comment", foreign_keys=[CommentRating.comment_id])

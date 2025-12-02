@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, func, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
+
+from . import Post
 from ..base import Base
 
 class Topic(Base):
@@ -19,4 +21,4 @@ class Topic(Base):
     author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     author = relationship("User", back_populates="topics_created")
-    posts = relationship("Topic", back_populates="topic", foreign_keys=["Post.topic_id"], cascade="all, delete")
+    posts = relationship("Post", back_populates="topic", foreign_keys=[Post.topic_id], cascade="all, delete")

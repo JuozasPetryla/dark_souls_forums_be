@@ -1,5 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, func, Boolean, ForeignKey, Text
 from sqlalchemy.orm import relationship
+
+from src.db.models.favorite_post import FavoritePost
+from src.db.models.comment import Comment
 from ..base import Base
 
 class Post(Base):
@@ -23,5 +26,5 @@ class Post(Base):
 
     author = relationship("User", back_populates="posts", foreign_keys=[author_id])
     topic = relationship("Topic", back_populates="posts", foreign_keys=[topic_id])
-    favorites = relationship("FavoritePost", back_populates="post", foreign_keys=["FavoritePost.post_id"], cascade="all, delete")
-    comments = relationship("Comment", back_populates="post", foreign_keys=["Comment.post_id"], cascade="all, delete")
+    favorites = relationship("FavoritePost", back_populates="post", foreign_keys=[FavoritePost.post_id], cascade="all, delete")
+    comments = relationship("Comment", back_populates="post", foreign_keys=[Comment.post_id], cascade="all, delete")

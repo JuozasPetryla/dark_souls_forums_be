@@ -1,11 +1,12 @@
-import os
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from pathlib import Path
+project_root = Path(__file__).resolve().parents[2]
+sys.path.append(str(project_root))
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-from core.config import settings
-from db.base import Base
+from src.core.config import settings
+from src.db.base import Base
 
 config = context.config
 fileConfig(config.config_file_name)

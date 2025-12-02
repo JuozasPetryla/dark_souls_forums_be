@@ -25,8 +25,8 @@ htmlcov/
 .ipynb_checkpoints/
 *.ipynb
 
-app/alembic/__pycache__/
-app/alembic/versions/__pycache__/
+src/alembic/__pycache__/
+src/alembic/versions/__pycache__/
 
 postgres_data/
 *.pid

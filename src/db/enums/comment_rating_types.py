@@ -1,5 +1,5 @@
 from enum import Enum
 
-class CommentRatingTypes(Enum):
+class CommentRatingTypes(str, Enum):
     POSITIVE = "positive"
     NEGATIVE = "negative"

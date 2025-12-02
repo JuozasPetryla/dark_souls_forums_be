@@ -35,7 +35,7 @@ services:
       POSTGRES_PORT: 5432
       DOCKER_ENV: 1
     volumes:
-      - .:/app 
+      - .:/src
     ports:
       - "${WEB_PORT}:8000"
     depends_on:
