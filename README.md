@@ -7,9 +7,17 @@
 ## Setup
 
 1. Setup environmental variables:  
-```cp .env.placeholder .env```
+```bash
+cp .env.placeholder .env
+```
 2. Launch the containers:  
-`docker-compose up --build -d`
+```bash 
+docker-compose up --build -d
+```
+3. Run DB migrations:
+```
+docker compose exec web bash -c "cd app && alembic upgrade head"
+```
 
 ---
 

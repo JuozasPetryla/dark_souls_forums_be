@@ -1,8 +1,11 @@
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-from app.core.config import settings
-from app.db.base import Base
+from core.config import settings
+from db.base import Base
 
 config = context.config
 fileConfig(config.config_file_name)
@@ -33,3 +36,4 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
+
