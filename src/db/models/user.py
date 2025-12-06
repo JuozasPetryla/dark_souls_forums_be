@@ -1,16 +1,16 @@
 from sqlalchemy import Column, Integer, String, DateTime, func, Boolean, Enum, Text
 from sqlalchemy.orm import relationship
 
-from src.db.models.game import Game
-from src.db.models.topic import Topic
-from src.db.models.user_relation import UserRelation
-from src.db.models.steam_account import SteamAccount
-from src.db.models.post import Post
-from src.db.models.favorite_post import FavoritePost
-from src.db.models.comment import Comment
-from src.db.models.comment_rating import CommentRating
-from ..base import Base
-from ..enums import UserRoles
+from .game import Game
+from .topic import Topic
+from .user_relation import UserRelation
+from .steam_account import SteamAccount
+from .post import Post
+from .favorite_post import FavoritePost
+from .comment import Comment
+from .comment_rating import CommentRating
+from src.db.base import Base
+from src.db.enums import UserRoles
 
 class User(Base):
     __tablename__ = "users"

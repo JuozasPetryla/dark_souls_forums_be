@@ -34,8 +34,11 @@ services:
       POSTGRES_SERVER: db
       POSTGRES_PORT: 5432
       DOCKER_ENV: 1
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_SIGNING_ALGORITHM: ${JWT_SIGNING_ALGORITHM}
+      JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES}
     volumes:
-      - .:/src
+      - ./src:/dark_souls_forums_be/src
     ports:
       - "${WEB_PORT}:8000"
     depends_on:

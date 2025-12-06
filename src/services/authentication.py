@@ -1,26 +1,28 @@
 import time
 import jwt
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pwdlib import PasswordHash
 from src.core.config import settings
 from sqlalchemy.orm import Session
 from src.db.models import User
+from src.db.session import get_db_session
+from datetime import datetime
 
 password_hash = PasswordHash.recommended()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+bearer_scheme = HTTPBearer()
 
-def hash_password(password: str) -> str:
+def _hash_password(password: str) -> str:
     return password_hash.hash(password)
 
-def verify_password_hash(password: str, password_hashed: str) -> str:
+def _verify_password_hash(password: str, password_hashed: str) -> bool:
     return password_hash.verify(password, password_hashed)
 
 def create_access_token(user_id: int) -> str:
     now = int(time.time())
 
     payload = {
-        "sub": user_id,
+        "sub": str(user_id),
         "iat": now,
         "exp": now + (settings.JWT_EXPIRATION_MINUTES * 60),
     }
@@ -45,7 +47,8 @@ def get_user_by_email(db: Session, email: str):
 def get_user_by_nickname(db: Session, nickname: str):
     return db.query(User).filter(User.nickname == nickname).first()
 
-def get_user_by_token(db: Session, token: str = Depends(oauth2_scheme)):
+def get_user_by_token(db: Session = Depends(get_db_session), credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+    token = credentials.credentials
     payload = decode_access_token(token)
 
     user_id = int(payload["sub"])
@@ -59,13 +62,13 @@ def get_user_by_token(db: Session, token: str = Depends(oauth2_scheme)):
 def create_user(db: Session, nickname: str, email: str, password: str):
     existing_email = get_user_by_email(db, email)
     if existing_email:
-        raise HTTPException(status_code=400, detail="Email is already taken")
+        raise HTTPException(status_code=409, detail="Email is already taken")
 
     existing_nickname = get_user_by_nickname(db, nickname)
     if existing_nickname:
-        raise HTTPException(status_code=400, detail="Nickname is already taken")
+        raise HTTPException(status_code=409, detail="Nickname is already taken")
 
-    hashed_password = hash_password(password)
+    hashed_password = _hash_password(password)
     user = User(nickname=nickname, email=email, password_hash=hashed_password)
 
     db.add(user)
@@ -73,3 +76,11 @@ def create_user(db: Session, nickname: str, email: str, password: str):
     db.refresh(user)
 
     return user
+
+def verify_password(password: str, user: User) -> bool:
+    return _verify_password_hash(password, user.password_hash)
+
+def update_user_login_time(db: Session, user: User):
+    user.last_login_at = datetime.utcnow()
+    db.commit()
+    db.refresh(user)

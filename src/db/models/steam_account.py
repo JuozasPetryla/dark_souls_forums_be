@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, func
 from sqlalchemy.orm import relationship
-from ..base import Base
+from src.db.base import Base
 
 class SteamAccount(Base):
     __tablename__ = "steam_accounts"

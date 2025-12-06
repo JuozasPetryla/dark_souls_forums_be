@@ -16,7 +16,7 @@ docker-compose up --build -d
 ```
 3. Run DB migrations:
 ```
-docker compose exec web bash -c "cd src && alembic upgrade head"
+docker compose exec web bash -c "cd /dark_souls_forums_be && alembic upgrade head"
 ```
 
 ---
