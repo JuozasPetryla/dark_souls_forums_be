@@ -5,7 +5,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pwdlib import PasswordHash
 from src.core.config import settings
 from sqlalchemy.orm import Session
-from src.db.models import User
+from src.db.models import User, SteamAccount
 from src.db.session import get_db_session
 from datetime import datetime
 
@@ -47,6 +47,9 @@ def get_user_by_email(db: Session, email: str):
 def get_user_by_nickname(db: Session, nickname: str):
     return db.query(User).filter(User.nickname == nickname).first()
 
+def get_user_steam_account(db: Session, user_id: int):
+    return db.query(SteamAccount).filter(SteamAccount.user_id == user_id).first()
+
 def get_user_by_token(db: Session = Depends(get_db_session), credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
     token = credentials.credentials
     payload = decode_access_token(token)
@@ -84,3 +87,20 @@ def update_user_login_time(db: Session, user: User):
     user.last_login_at = datetime.utcnow()
     db.commit()
     db.refresh(user)
+
+def set_steam_account(db: Session, user: User, steam_id: str):
+    existing_steam_account = get_user_steam_account(db, user.id)
+
+    if existing_steam_account:
+        existing_steam_account.steam_id = steam_id
+        existing_steam_account.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(existing_steam_account)
+        return existing_steam_account
+
+    new_steam_account = SteamAccount(steam_id=steam_id, updated_at=datetime.utcnow(), user_id=user.id)
+    db.add(new_steam_account)
+    db.commit()
+    db.refresh(new_steam_account)
+
+    return new_steam_account
