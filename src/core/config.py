@@ -20,4 +20,6 @@ class Settings:
     JWT_SIGNING_ALGORITHM = os.getenv("JWT_SIGNING_ALGORITHM")
     JWT_EXPIRATION_MINUTES = int(os.getenv("JWT_EXPIRATION_MINUTES"))
 
+    STEAM_API_KEY = os.getenv("STEAM_API_KEY")
+
 settings = Settings()
