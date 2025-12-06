@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, DateTime, func, Boolean, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
-from src.db.models.favorite_post import FavoritePost
-from src.db.models.comment import Comment
-from ..base import Base
+from .favorite_post import FavoritePost
+from .comment import Comment
+from src.db.base import Base
 
 class Post(Base):
     __tablename__ = "posts"

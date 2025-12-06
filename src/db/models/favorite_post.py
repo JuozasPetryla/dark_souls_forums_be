@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, DateTime, func, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
-from ..base import Base
+from src.db.base import Base
 
 class FavoritePost(Base):
     __tablename__ = "favorite_posts"

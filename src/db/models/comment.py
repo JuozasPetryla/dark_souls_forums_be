@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, func, Boolean, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
-from src.db.models.comment_rating import CommentRating
-from ..base import Base
+from .comment_rating import CommentRating
+from src.db.base import Base
 
 class Comment(Base):
     __tablename__ = "comments"

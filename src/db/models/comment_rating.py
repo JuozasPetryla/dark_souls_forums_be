@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, Enum, UniqueConstraint
 from sqlalchemy.orm import relationship
-from ..base import Base
-from ..enums import CommentRatingTypes
+from src.db.base import Base
+from src.db.enums import CommentRatingTypes
 
 class CommentRating(Base):
     __tablename__ = "comment_ratings"

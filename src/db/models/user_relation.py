@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, Enum, DateTime, func
 from sqlalchemy.orm import relationship
-from ..base import Base
-from ..enums import UserRelationStatuses, UserRelationTypes
+from src.db.base import Base
+from src.db.enums import UserRelationStatuses, UserRelationTypes
 
 class UserRelation(Base):
     __tablename__ = "user_relations"

@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, func, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
-from . import Post
-from ..base import Base
+from .post import Post
+from src.db.base import Base
 
 class Topic(Base):
     __tablename__ = "topics"
