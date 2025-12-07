@@ -25,6 +25,24 @@ def create(content: str = Body(...), db: Session = Depends(get_db_session)):
         "comment_content": new_comment.content,
     }
 
+@comments_router.get("/read_all/{post_id}")
+def read_all(post_id: int, db: Session = Depends(get_db_session)):
+    comments = db.query(Comment).filter(Comment.post_id == post_id).order_by(Comment.created_at).all()
+    
+    if not comments:
+        return {"comments": []}
+    
+    result = [
+        {
+            "id": c.id,
+            "author": f"User {c.author_id}",
+            "date": c.created_at.strftime("%Y-%m-%d %H:%M"),
+            "text": c.content
+        } 
+        for c in comments
+    ]
+    
+    return {"comments": result}
 
 @comments_router.get("/read/{comment_id}")
 def read(comment_id: int, db: Session = Depends(get_db_session)):
