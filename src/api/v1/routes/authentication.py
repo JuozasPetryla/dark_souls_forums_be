@@ -47,3 +47,12 @@ def login(email: str = Body(...), password: str = Body(...),  db: Session = Depe
             "access_token": token,
         }
     )
+
+@auth_router.post("/logout")
+def logout():
+    return JSONResponse(
+        status_code=200,
+        content={
+            "success": "Successfully logged out!"
+        }
+    )

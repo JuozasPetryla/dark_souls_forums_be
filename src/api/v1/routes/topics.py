@@ -9,7 +9,6 @@ import sqlalchemy as sa
 
 topics_router = APIRouter()
 
-# TO ADD: authentication check and author_id get when login is done
 @topics_router.post("/create")
 def create(title: str = Body(...), image_link: str = Body(...), db: Session = Depends(get_db_session)):
     author_id = 1  # temporary, will change when login is implemented
@@ -54,6 +53,16 @@ def read(topic_id: int, db: Session = Depends(get_db_session)):
             "posts": posts
         })
     )
+
+@topics_router.get("/read")
+def read(db: Session = Depends(get_db_session)):
+    topics = db.query(Topic).all()
+
+    if not topics:
+        raise HTTPException(status_code=404, detail="No topics found")
+
+    return topics
+
 
 @topics_router.put("/update/{topic_id}")
 def update(topic_id: int, title: str = Body(...), image_link: str = Body(...), db: Session = Depends(get_db_session)):
