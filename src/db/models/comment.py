@@ -22,4 +22,4 @@ class Comment(Base):
 
     author = relationship("User", back_populates="comments", foreign_keys=[author_id])
     post = relationship("Post", back_populates="comments", foreign_keys=[post_id])
-    ratings = relationship("CommentRating", back_populates="comment", foreign_keys=[CommentRating.comment_id])
+    ratings = relationship("CommentRating", back_populates="comment", foreign_keys=[CommentRating.comment_id], cascade="all, delete, delete-orphan")
