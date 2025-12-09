@@ -1,10 +1,19 @@
 from sqlalchemy.orm import Session
 from src.db.session import get_db_session
-from src.services.authentication import create_user, create_access_token, get_user_by_email, verify_password, update_user_login_time
-from fastapi import APIRouter, Depends, Body, Form, Header, HTTPException
+from src.services.authentication import create_user, create_access_token, get_user_by_email, verify_password, update_user_login_time, get_user_by_token
+from fastapi import APIRouter, Depends, Body, Form, Header, Depends, HTTPException
 from fastapi.responses import JSONResponse
+from src.db.models import User
 
 auth_router = APIRouter()
+
+@auth_router.get("/me")
+def get_me(current_user: User = Depends(get_user_by_token)):
+    return {
+        "id": current_user.id,
+        "nickname": current_user.nickname,
+        "email": current_user.email,
+    }
 
 @auth_router.post("/register")
 def register(nickname: str = Body(...), email: str = Body(...), password: str = Body(...), db: Session = Depends(get_db_session)):

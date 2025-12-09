@@ -4,17 +4,33 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from src.db.session import get_db_session
 from src.db.models import Comment, CommentRating
-from src.schemas.comment_rating import CommentRatingCreate
+from src.schemas.comment_rating import CommentRatingCreate, CommentRatingUpdate
 import sqlalchemy as sa
+from src.db.models import User
+
+from src.services.authentication import get_user_by_token
+
 
 comments_rating_router = APIRouter()
 
 
 @comments_rating_router.post("/create")
-def create(rating_data: CommentRatingCreate = Body(...), db: Session = Depends(get_db_session)):
-    user_id = 1
-    comment_id = 8
-    new_rating = CommentRating(rating=rating_data.rating, user_id=user_id, comment_id=comment_id)
+def create(rating_data: CommentRatingCreate = Body(...), db: Session = Depends(get_db_session), current_user: User = Depends(get_user_by_token)):
+    
+    user_id = current_user.id
+    comment = db.query(Comment).filter(Comment.id == rating_data.comment_id).first()
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+
+    existing = db.query(CommentRating).filter(
+        CommentRating.user_id == user_id,
+        CommentRating.comment_id == rating_data.comment_id
+    ).first()
+
+    if existing:
+        raise HTTPException(status_code=400, detail="User already rated this comment")
+
+    new_rating = CommentRating(rating=rating_data.rating, user_id=user_id, comment_id=rating_data.comment_id)
     db.add(new_rating)
     db.commit()
     db.refresh(new_rating)
@@ -38,10 +54,12 @@ def read(rating_id: int, db: Session = Depends(get_db_session)):
     })
 
 @comments_rating_router.put("/update/{rating_id}")
-def update(rating_id: int, rating_data: CommentRatingCreate = Body(...), db: Session = Depends(get_db_session)):
+def update(rating_id: int, rating_data: CommentRatingUpdate = Body(...), db: Session = Depends(get_db_session), current_user: User = Depends(get_user_by_token)):
     comment_rating = db.query(CommentRating).filter(CommentRating.id == rating_id).first()
     if not comment_rating:
         raise HTTPException(status_code=404, detail="Rating not found")
+    if comment_rating.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this rating")
 
     comment_rating.rating = rating_data.rating
 
@@ -55,11 +73,14 @@ def update(rating_id: int, rating_data: CommentRatingCreate = Body(...), db: Ses
     }
 
 @comments_rating_router.delete("/delete/{rating_id}")
-def delete(rating_id: int, db: Session = Depends(get_db_session)):
+def delete(rating_id: int, db: Session = Depends(get_db_session), current_user: User = Depends(get_user_by_token)):
     comment_rating = db.query(CommentRating).filter(CommentRating.id == rating_id).first()
     if not comment_rating:
         raise HTTPException(status_code=404, detail="Comment rating not found")
-
+    
+    if comment_rating.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this rating")
+    
     db.delete(comment_rating)
     db.commit()
 
