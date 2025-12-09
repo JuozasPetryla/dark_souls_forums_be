@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from src.db.enums import UserRelationStatuses, UserRelationTypes
+from datetime import datetime
+
 
 class UserRelationCreate(BaseModel):
     user_b_id: int
@@ -9,9 +11,10 @@ class UserRelationResponse(BaseModel):
     id: int
     user_a_id: int
     user_b_id: int
-    status: UserRelationStatuses
     type: UserRelationTypes
-    updated_at: str
+    status: UserRelationStatuses
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

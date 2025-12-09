@@ -1,3 +1,4 @@
+from src.db.models.user import User
 from sqlalchemy.orm import Session
 from src.db.session import get_db_session
 from fastapi import APIRouter, Depends, Body, Form, Header, HTTPException
@@ -5,28 +6,36 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import Optional
 from src.db.models import Topic, Post
+from src.services.authentication import get_user_by_token
 import sqlalchemy as sa
 
 topics_router = APIRouter()
 
-@topics_router.post("/create")
-def create(title: str = Body(...), image_link: str = Body(...), db: Session = Depends(get_db_session)):
-    author_id = 1  # temporary, will change when login is implemented
 
-    new_topic = Topic(title=title, image=image_link, author_id=author_id)
+@topics_router.post("/create")
+def create(
+    title: str = Body(...),
+    image_link: str = Body(...),
+    db: Session = Depends(get_db_session),
+    user: User = Depends(get_user_by_token),
+):
+    new_topic = Topic(
+        title=title,
+        image=image_link,
+        author_id=user.id
+    )
 
     db.add(new_topic)
     db.commit()
     db.refresh(new_topic)
 
-    return JSONResponse(
-        status_code=201,
-        content={
-            "message": "Topic created successfully",
-            "topic_id": new_topic.id,
-            "topic_title": new_topic.title,
-        }
-    )
+    return {
+        "message": "Topic created successfully",
+        "topic_id": new_topic.id,
+        "topic_title": new_topic.title,
+        "author_id": new_topic.author_id,
+        "author_nickname": user.nickname 
+    }
 
 @topics_router.get("/read/{topic_id}")
 def read(topic_id: int, db: Session = Depends(get_db_session)):
@@ -40,6 +49,8 @@ def read(topic_id: int, db: Session = Depends(get_db_session)):
 
     posts = db.query(Post).filter(Post.topic_id == topic_id).all()
 
+    author = db.query(User).filter(User.id == topic.author_id).first()
+
     return JSONResponse(
         status_code=200,
         content=jsonable_encoder({
@@ -50,6 +61,11 @@ def read(topic_id: int, db: Session = Depends(get_db_session)):
             "created_at": topic.created_at,
             "modified_at": topic.modified_at,
             "locked": topic.locked,
+            "author": {
+                "id": author.id,
+                "nickname": author.nickname,
+                "image": author.image
+            },
             "posts": posts
         })
     )
@@ -61,7 +77,22 @@ def read(db: Session = Depends(get_db_session)):
     if not topics:
         raise HTTPException(status_code=404, detail="No topics found")
 
-    return topics
+    result = []
+    for topic in topics:
+        author = db.query(User).filter(User.id == topic.author_id).first()
+        result.append({
+            "id": topic.id,
+            "title": topic.title,
+            "image": topic.image,
+            "modified_at": topic.modified_at,
+            "author": {
+                "id": author.id,
+                "nickname": author.nickname,
+                "image": author.image
+            }
+        })
+
+    return JSONResponse(content=jsonable_encoder(result))
 
 
 @topics_router.put("/update/{topic_id}")

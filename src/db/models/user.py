@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, func, Boolean, Enum, Text
+from sqlalchemy import Column, Integer, String, DateTime, func, Boolean, Enum, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
 from .game import Game

@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 class UserView(BaseModel):
     id: int
-    last_login_at: datetime
+    last_login_at: datetime | None
     nickname: str
     image: str | None
     bio: str | None
