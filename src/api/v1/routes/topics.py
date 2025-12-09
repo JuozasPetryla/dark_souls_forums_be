@@ -1,11 +1,18 @@
 from sqlalchemy.orm import Session
 from src.db.session import get_db_session
-from fastapi import APIRouter, Depends, Body, Form, Header, HTTPException
+from fastapi import APIRouter, Depends, Body, UploadFile, File, HTTPException
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import Optional
 from src.db.models import Topic, Post
 import sqlalchemy as sa
+import shutil
+import uuid
+import os
+
+UPLOAD_DIR = "/dark_souls_forums_be/src/static/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 topics_router = APIRouter()
 
@@ -44,6 +51,7 @@ def read(topic_id: int, db: Session = Depends(get_db_session)):
         status_code=200,
         content=jsonable_encoder({
             "id": topic.id,
+            "description": topic.description,
             "title": topic.title,
             "image": topic.image,
             "view_count": topic.view_count,
@@ -102,3 +110,23 @@ def delete(topic_id: int, db: Session = Depends(get_db_session)):
             "message": f"Topic '{topic.title}' deleted successfully"
         }
     )
+
+@topics_router.post("/upload-image")
+async def upload_image(image: UploadFile = File(...)):
+    # Validate file type
+    if not image.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+
+    # Generate unique filename
+    ext = image.filename.split(".")[-1]
+    filename = f"{uuid.uuid4()}.{ext}"
+    file_path = os.path.join(UPLOAD_DIR, filename)
+
+    # Save file to disk
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(image.file, buffer)
+
+    # URL that frontend can use to access the image
+    file_url = f"/static/uploads/{filename}"
+
+    return {"url": file_url}
