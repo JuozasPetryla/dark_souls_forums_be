@@ -15,88 +15,79 @@ depends_on = None
 def upgrade() -> None:
     # --- Insert Users ---
     op.execute("""
-        INSERT INTO users (id, email, password_hash, nickname, name, surname, playing_class)
+        INSERT INTO users (email, password_hash, nickname, name, surname, playing_class)
         VALUES
-        (1, 'admin@example.com', 'hashed_password', 'AdminGuy', 'Admin', 'User', 'Knight'),
-        (2, 'player1@example.com', 'hashed_pw1', 'Sunbro42', 'Solaire', 'Astora', 'Warrior'),
-        (3, 'player2@example.com', 'hashed_pw2', 'TarnishedMage', 'Ranni', 'Carian', 'Mage');
-        SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
+        ('admin@example.com', 'hashed_password', 'AdminGuy', 'Admin', 'User', 'Knight'),
+        ('player1@example.com', 'hashed_pw1', 'Sunbro42', 'Solaire', 'Astora', 'Warrior'),
+        ('player2@example.com', 'hashed_pw2', 'TarnishedMage', 'Ranni', 'Carian', 'Mage');
     """)
 
     # --- Insert User Relations ---
     op.execute("""
-        INSERT INTO user_relations (id, status, type, user_a_id, user_b_id)
+        INSERT INTO user_relations (status, type, user_a_id, user_b_id)
         VALUES
-        (1, 'accepted', 'friend', 1, 2),
-        (2, 'pending', 'friend', 2, 3),
-        (3, 'declined', 'blocked', 3, 1);
-        SELECT setval('user_relations_id_seq', (SELECT MAX(id) FROM user_relations));
+        ('accepted', 'friend', 1, 2),
+        ('pending', 'friend', 2, 3),
+        ('declined', 'blocked', 3, 1);
     """)
 
     # --- Insert Topics ---
     op.execute("""
-        INSERT INTO topics (id, title, image, author_id)
+        INSERT INTO topics (title, image, author_id)
         VALUES
-        (1, 'Best Dark Souls Builds', '/img/builds.png', 1),
-        (2, 'Boss Strategies Megathread', '/img/bosses.png', 2);
-        SELECT setval('topics_id_seq', (SELECT MAX(id) FROM topics));
+        ('Best Dark Souls Builds', '/img/builds.png', 1),
+        ('Boss Strategies Megathread', '/img/bosses.png', 2);
     """)
 
     # --- Insert Posts ---
     op.execute("""
-        INSERT INTO posts (id, title, content, summary, author_id, topic_id)
+        INSERT INTO posts (title, content, summary, author_id, topic_id)
         VALUES
-        (1, 'My favorite STR build', 'Go full strength...', 'STR build guide', 1, 1),
-        (2, 'How to defeat Ornstein & Smough', 'Use pillars...', 'Boss tips', 2, 2),
-        (3, 'Mage starter tips', 'Use early spells...', 'Mage guide', 3, 1);
-        SELECT setval('posts_id_seq', (SELECT MAX(id) FROM posts));
+        ('My favorite STR build', 'Go full strength...', 'STR build guide', 1, 1),
+        ('How to defeat Ornstein & Smough', 'Use pillars...', 'Boss tips', 2, 2),
+        ('Mage starter tips', 'Use early spells...', 'Mage guide', 3, 1);
     """)
 
     # --- Insert Comments ---
     op.execute("""
-        INSERT INTO comments (id, content, author_ip_address, author_id, post_id)
+        INSERT INTO comments (content, author_ip_address, author_id, post_id)
         VALUES
-        (1, 'Great build, thanks!', '192.168.1.10', 2, 1),
-        (2, 'These tips helped a lot.', '10.0.0.20', 3, 2),
-        (3, 'I prefer dexterity builds!', '192.168.1.15', 1, 1);
-        SELECT setval('comments_id_seq', (SELECT MAX(id) FROM comments));
+        ('Great build, thanks!', '192.168.1.10', 2, 1),
+        ('These tips helped a lot.', '10.0.0.20', 3, 2),
+        ('I prefer dexterity builds!', '192.168.1.15', 1, 1);
     """)
 
     # --- Insert Favorite Posts ---
     op.execute("""
-        INSERT INTO favorite_posts (id, user_id, post_id)
+        INSERT INTO favorite_posts (user_id, post_id)
         VALUES
-        (1, 1, 2),
-        (2, 2, 1);
-        SELECT setval('favorite_posts_id_seq', (SELECT MAX(id) FROM favorite_posts));
+        (1, 2),
+        (2, 1);
     """)
 
     # --- Insert Comment Ratings ---
     op.execute("""
-        INSERT INTO comment_ratings (id, rating, user_id, comment_id)
+        INSERT INTO comment_ratings (rating, user_id, comment_id)
         VALUES
-        (1, 'positive', 1, 1),
-        (2, 'positive', 2, 2),
-        (3, 'negative', 3, 3);
-        SELECT setval('comment_ratings_id_seq', (SELECT MAX(id) FROM comment_ratings));
+        ('positive', 1, 1),
+        ('positive', 2, 2),
+        ('negative', 3, 3);
     """)
 
     # --- Insert Games ---
     op.execute("""
-        INSERT INTO games (id, name, hours_played, user_id)
+        INSERT INTO games (name, hours_played, user_id)
         VALUES
-        (1, 'Dark Souls Remastered', 120, 1),
-        (2, 'Elden Ring', 200, 2),
-        (3, 'Dark Souls 3', 80, 3);
-        SELECT setval('games_id_seq', (SELECT MAX(id) FROM games));
+        ('Dark Souls Remastered', 120, 1),
+        ('Elden Ring', 200, 2),
+        ('Dark Souls 3', 80, 3);
     """)
 
     # --- Insert Steam Accounts ---
     op.execute("""
-        INSERT INTO steam_accounts (id, steam_id, user_id)
+        INSERT INTO steam_accounts (steam_id, user_id)
         VALUES
-        (1, 'STEAM_0001', 1),
-        (2, 'STEAM_0002', 2),
-        (3, 'STEAM_0003', 3);
-        SELECT setval('steam_accounts_id_seq', (SELECT MAX(id) FROM steam_accounts));
+        ('STEAM_0001', 1),
+        ('STEAM_0002', 2),
+        ('STEAM_0003', 3);
     """)

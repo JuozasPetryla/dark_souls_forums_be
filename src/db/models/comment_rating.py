@@ -6,7 +6,7 @@ from src.db.enums import CommentRatingTypes
 class CommentRating(Base):
     __tablename__ = "comment_ratings"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     rating = Column(Enum(CommentRatingTypes, values_callable=lambda obj: [e.value for e in obj]), nullable=False)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)

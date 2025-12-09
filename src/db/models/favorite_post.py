@@ -5,7 +5,7 @@ from src.db.base import Base
 class FavoritePost(Base):
     __tablename__ = "favorite_posts"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
     created_at = Column(DateTime, nullable=False, server_default=func.now())
 

@@ -7,7 +7,7 @@ from src.db.base import Base
 class Topic(Base):
     __tablename__ = "topics"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     description = Column(String(255), nullable=True)
     title = Column(String(255), nullable=False)
     image = Column(String(255), nullable=False)

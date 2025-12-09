@@ -24,6 +24,7 @@ class UserView(BaseModel):
     surname: str | None
     postal_code: str | None
     phone_number: str | None
+    steam_id: str | None = None
 
     model_config = {
         "from_attributes": True
@@ -67,7 +68,9 @@ def delete_my_profile(user: User = Depends(get_user_by_token), db: Session = Dep
 
 @profiles_router.get("/profile/me", response_model=UserView)
 def get_my_profile(user: User = Depends(get_user_by_token)):
-    return UserView.from_orm(user)
+    view = UserView.from_orm(user)
+    view.steam_id = user.steam_account.steam_id if user.steam_account else None
+    return view
 
 
 @profiles_router.get("/profile/{id}", response_model=UserView)
@@ -77,7 +80,9 @@ def get_profile(id: int, db: Session = Depends(get_db_session)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return UserView.from_orm(user)
+    view = UserView.from_orm(user)
+    view.steam_id = user.steam_account.steam_id if user.steam_account else None
+    return view
 
 @profiles_router.post("/profile/steam/add")
 def update_steam_id(steam_id: str = Body(...), db: Session = Depends(get_db_session), user: User = Depends(get_user_by_token)):

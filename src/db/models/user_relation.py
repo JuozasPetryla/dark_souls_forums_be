@@ -7,7 +7,7 @@ from datetime import datetime
 class UserRelation(Base):
     __tablename__ = "user_relations"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
     
     type = Column(
