@@ -10,10 +10,10 @@ import sqlalchemy as sa
 topics_router = APIRouter()
 
 @topics_router.post("/create")
-def create(title: str = Body(...), image_link: str = Body(...), db: Session = Depends(get_db_session)):
+def create(title: str = Body(...), description: str = Body(...), image_link: str = Body(...), db: Session = Depends(get_db_session)):
     author_id = 1  # temporary, will change when login is implemented
 
-    new_topic = Topic(title=title, image=image_link, author_id=author_id)
+    new_topic = Topic(title=title, description=description, image=image_link, author_id=author_id)
 
     db.add(new_topic)
     db.commit()
@@ -65,13 +65,14 @@ def read(db: Session = Depends(get_db_session)):
 
 
 @topics_router.put("/update/{topic_id}")
-def update(topic_id: int, title: str = Body(...), image_link: str = Body(...), db: Session = Depends(get_db_session)):
+def update(topic_id: int, title: str = Body(...), description: str = Body(...), image_link: str = Body(...), db: Session = Depends(get_db_session)):
     topic = db.query(Topic).filter(Topic.id == topic_id).first()
     if not topic:
         raise HTTPException(status_code=404, detail="Topic not found")
 
     topic.title = title
     topic.image = image_link
+    topic.description = description
     topic.modified_at = sa.text('now()')
 
     db.commit()
