@@ -21,5 +21,6 @@ class Settings:
     JWT_EXPIRATION_MINUTES = int(os.getenv("JWT_EXPIRATION_MINUTES"))
 
     STEAM_API_KEY = os.getenv("STEAM_API_KEY")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 settings = Settings()

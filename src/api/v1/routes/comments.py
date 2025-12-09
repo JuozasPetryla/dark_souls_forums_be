@@ -5,8 +5,10 @@ from fastapi.encoders import jsonable_encoder
 from src.db.session import get_db_session
 from src.db.models import Comment, CommentRating
 from src.schemas.comment import CommentCreate, CommentUpdate
+from src.schemas.comment_iq import CommentIQRequest
 from src.db.models import User
 from src.services.authentication import get_user_by_token
+from src.services.comments import calculate_and_save_comment_iq
 import hashlib
 
 import sqlalchemy as sa
@@ -133,3 +135,9 @@ def delete(comment_id: int, db: Session = Depends(get_db_session), current_user:
     return {
         "message": f"Comment '{comment.content}' deleted successfully"
     }
+
+
+@comments_router.post("/comments/{comment_id}/calculate-iq")
+async def calculate_comment_iq(comment_id: int, req: CommentIQRequest, db: Session = Depends(get_db_session)):
+    iq = await calculate_and_save_comment_iq(db, comment_id, req.text)
+    return {"comment_id": comment_id, "comment_iq": iq}
