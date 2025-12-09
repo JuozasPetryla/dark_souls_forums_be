@@ -8,6 +8,7 @@ class Topic(Base):
     __tablename__ = "topics"
 
     id = Column(Integer, primary_key=True, index=True)
+    description = Column(String(255), nullable=True)
     title = Column(String(255), nullable=False)
     image = Column(String(255), nullable=False)
 
