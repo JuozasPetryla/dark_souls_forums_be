@@ -5,7 +5,7 @@ Create Date: 2025-12-08
 """ 
 from typing import Sequence, Union 
 from alembic import op 
-import sqlalchemy as sa 
+import sqlalchemy as sa
 
 revision: str = "seed_mock_data" 
 down_revision: Union[str, Sequence[str], None] = "4301a7eb3cf0" 
@@ -17,9 +17,9 @@ def upgrade() -> None:
     op.execute("""
         INSERT INTO users (email, password_hash, nickname, name, surname, playing_class)
         VALUES
-        ('admin@example.com', 'hashed_password', 'AdminGuy', 'Admin', 'User', 'Knight'),
-        ('player1@example.com', 'hashed_pw1', 'Sunbro42', 'Solaire', 'Astora', 'Warrior'),
-        ('player2@example.com', 'hashed_pw2', 'TarnishedMage', 'Ranni', 'Carian', 'Mage');
+        ('admin@example.com', '$argon2id$v=19$m=65536,t=3,p=4$4wG2tLoWZzRJqpt5UKBy7g$ZC2ZslRcJdz+1MrhQIpbVDek4bG/nQYpgL/KLBFwEUY', 'AdminGuy', 'Admin', 'User', 'Knight'),
+        ('player1@example.com', '$argon2id$v=19$m=65536,t=3,p=4$4wG2tLoWZzRJqpt5UKBy7g$ZC2ZslRcJdz+1MrhQIpbVDek4bG/nQYpgL/KLBFwEUY', 'Sunbro42', 'Solaire', 'Astora', 'Warrior'),
+        ('player2@example.com', '$argon2id$v=19$m=65536,t=3,p=4$4wG2tLoWZzRJqpt5UKBy7g$ZC2ZslRcJdz+1MrhQIpbVDek4bG/nQYpgL/KLBFwEUY', 'TarnishedMage', 'Ranni', 'Carian', 'Mage');
     """)
 
     # --- Insert User Relations ---
