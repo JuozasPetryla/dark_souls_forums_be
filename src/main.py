@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -6,6 +6,9 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.api.v1.routes import router as api_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
+from collections import defaultdict
+from typing import Dict, Set
 
 app = FastAPI(title="FastAPI Starter")
 
@@ -31,3 +34,44 @@ def custom_http_exception_handler(request, exc: HTTPException):
             "error": exc.detail,
         }
     )
+
+# Store active viewers per topic
+active_viewers: Dict[str, Set[WebSocket]] = defaultdict(set)
+
+@app.websocket("/ws/topic/{topic_id}")
+async def topic_viewer_websocket(websocket: WebSocket, topic_id: str):
+    await websocket.accept()
+    
+    # Add this viewer to the topic
+    active_viewers[topic_id].add(websocket)
+    
+    # Broadcast updated count to all viewers of this topic
+    await broadcast_viewer_count(topic_id)
+    
+    try:
+        # Keep connection alive and listen for disconnect
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        # Remove viewer when they disconnect
+        active_viewers[topic_id].discard(websocket)
+        await broadcast_viewer_count(topic_id)
+        
+        # Clean up empty topics
+        if not active_viewers[topic_id]:
+            del active_viewers[topic_id]
+
+async def broadcast_viewer_count(topic_id: str):
+    count = len(active_viewers[topic_id])
+    message = f"{count}"
+    
+    # Send count to all connected viewers
+    disconnected = set()
+    for connection in active_viewers[topic_id]:
+        try:
+            await connection.send_text(message)
+        except:
+            disconnected.add(connection)
+    
+    # Clean up any dead connections
+    active_viewers[topic_id] -= disconnected
