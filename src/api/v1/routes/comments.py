@@ -36,44 +36,6 @@ def create(request: Request, comment_data: CommentCreate, db: Session = Depends(
         "date": new_comment.created_at.strftime("%Y-%m-%d %H:%M")
     }
 
-from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, Body, HTTPException, Request
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
-from src.db.session import get_db_session
-from src.db.models import Comment, CommentRating
-from src.schemas.comment import CommentCreate, CommentUpdate
-from src.schemas.comment_iq import CommentIQRequest
-from src.db.models import User
-from src.services.authentication import get_user_by_token
-from src.services.comments import calculate_and_save_comment_iq
-import hashlib
-
-import sqlalchemy as sa
-
-comments_router = APIRouter()
-
-def hash_ip(ip: str) -> str:
-    return hashlib.sha256(ip.encode()).hexdigest()
-
-@comments_router.post("/create")
-def create(request: Request, comment_data: CommentCreate, db: Session = Depends(get_db_session), current_user: User = Depends(get_user_by_token)):
-    
-    author_id = current_user.id
-    real_ip = request.client.host
-    hashed_ip = hash_ip(real_ip)
-    new_comment = Comment(content=comment_data.content, author_ip_address=hashed_ip, author_id=author_id, post_id=comment_data.post_id)
-    db.add(new_comment)
-    db.commit()
-    db.refresh(new_comment)
-
-    return {
-        "message": "Comment created successfully",
-        "comment_id": new_comment.id,
-        "comment_content": new_comment.content,
-        "date": new_comment.created_at.strftime("%Y-%m-%d %H:%M")
-    }
-
 @comments_router.get("/read_all/{post_id}")
 def read_all(post_id: int, db: Session = Depends(get_db_session), current_user: User = Depends(get_user_by_token)):
     CURRENT_USER_ID = current_user.id
