@@ -13,6 +13,7 @@ def get_me(current_user: User = Depends(get_user_by_token)):
         "id": current_user.id,
         "nickname": current_user.nickname,
         "email": current_user.email,
+        "role": current_user.role
     }
 
 @auth_router.post("/register")
