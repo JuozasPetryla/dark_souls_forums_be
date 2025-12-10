@@ -9,6 +9,7 @@ from .profiles import profiles_router
 from .comments import comments_router
 from .comments_rating import comments_rating_router
 from .profile_relations import router as user_relations_router
+from .posts import posts_router
 
 router = APIRouter()
 
