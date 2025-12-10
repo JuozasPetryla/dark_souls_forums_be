@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import Optional
-from src.db.models import Topic, Post
+from src.db.models import Topic, Post, Comment
 from src.services.authentication import get_user_by_token
 import sqlalchemy as sa
 import shutil
@@ -161,3 +161,23 @@ async def upload_image(image: UploadFile = File(...)):
     file_url = f"/static/uploads/{filename}"
 
     return {"url": file_url}
+
+@topics_router.get("/read/statistics/{topic_id}")
+def read(topic_id: int, db: Session = Depends(get_db_session)):
+    topic = db.query(Topic).filter(Topic.id == topic_id).first()
+    if not topic:
+        raise HTTPException(status_code=404, detail="Topic not found")
+
+    postCount = db.query(Post).filter(Post.topic_id == topic_id).count()
+    commentCount = db.query(Comment).join(Post, Comment.post_id == Post.id).filter(Post.topic_id == topic_id).count()
+
+    return JSONResponse(
+        status_code=200,
+        content=jsonable_encoder({
+            "id": topic.id,
+            "title": topic.title,
+            "totalPosts": postCount,
+            "totalComments": commentCount,
+            "totalViews": topic.view_count
+        })
+    )

@@ -6,13 +6,14 @@ from src.db.models import User, UserRelation
 from src.schemas.user_relations import UserRelationCreate, UserRelationResponse
 from src.db.enums import UserRelationStatuses, UserRelationTypes
 from src.services.authentication import get_user_by_token
+from src.services.email import send_friend_request_email
 
 
 router = APIRouter()
 
 
 @router.post("/create", response_model=UserRelationResponse)
-def create_relation(
+async def create_relation(
     payload: UserRelationCreate,
     db: Session = Depends(get_db_session),
     current_user: User = Depends(get_user_by_token)
@@ -45,8 +46,12 @@ def create_relation(
     db.commit()
     db.refresh(relation)
 
-    return relation
+    if relation.type == UserRelationTypes.FRIEND and relation.status == UserRelationStatuses.PENDING:
+        target_user = db.query(User).filter(User.id == payload.user_b_id).first()
+        if target_user and target_user.email:
+            await send_friend_request_email(target_user.email, current_user.nickname), 
 
+    return relation
 
 @router.post("/{relation_id}/accept", response_model=UserRelationResponse)
 def accept_relation(

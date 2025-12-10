@@ -23,4 +23,9 @@ class Settings:
     STEAM_API_KEY = os.getenv("STEAM_API_KEY")
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME")
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD")
+    MAIL_FROM=os.getenv("MAIL_FROM")
+    MAIL_SERVER=os.getenv("MAIL_SERVER")
+
 settings = Settings()
