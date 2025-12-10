@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from src.db.models import Post, User, Topic, Comment, FavoritePost
 from src.services.authentication import get_user_by_token
+from src.services.posts import generate_and_save_post_summary
 import sqlalchemy as sa
 
 posts_router = APIRouter()
@@ -91,6 +92,40 @@ def read_all_posts(db: Session = Depends(get_db_session)):
         })
     
     return JSONResponse(content=jsonable_encoder(result))
+
+
+@posts_router.post("/generate-summary/{post_id}")
+async def generate_summary(
+    post_id: int,
+    db: Session = Depends(get_db_session),
+    user: User = Depends(get_user_by_token),
+):
+    """Sugeneruoti įrašo santrauką naudojant AI - Generate post summary using AI"""
+    
+    post = db.query(Post).filter(Post.id == post_id).first()
+    
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    # Check if user is the author of the post
+    if post.author_id != user.id:
+        raise HTTPException(status_code=403, detail="You can only generate summary for your own posts")
+    
+    try:
+        summary = await generate_and_save_post_summary(db, post_id, post.content, post.title)
+        
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "Summary generated successfully",
+                "post_id": post_id,
+                "summary": summary
+            }
+        )
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating summary: {str(e)}")
 
 
 @posts_router.post("/create")
